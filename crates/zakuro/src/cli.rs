@@ -31,43 +31,30 @@ pub struct Options {
 }
 
 const USAGE: &str = "\
-zakuro - a high-level-emulation Nintendo 3DS emulator
+angry-birds-trilogy - Angry Birds Trilogy for desktop
 
-usage: zakuro [rom.3ds|.cxi] [options]
+usage: angry-birds-trilogy [rom.3ds|.cci|.cxi|.cia] [options]
 
-Without a game it opens the library, the games in a folder you pick. The
-options below override the settings for this run.
+This build only opens the USA and Europe releases of Angry Birds Trilogy.
+Without a game it opens a library folder and lists matching game dumps only.
+The game dump must be decrypted. Recompile it locally from the library.
 
 options:
-  --renderer <vulkan|gl|software>  presentation backend (default: vulkan,
-                                   or gl where Vulkan does not start)
-  --rasterizer <hardware|software> where the 3D is drawn (default: hardware,
-                                   the host GPU through Vulkan, or software
-                                   where that does not start)
+  --renderer <vulkan|gl|software>  presentation backend
+  --rasterizer <hardware|software> where the 3D is drawn
   --scale <n>                      window scale factor (default: 2)
   (Esc opens the menu over a game, F1 pauses, F11 goes fullscreen)
   --headless <frames>              run without a window and print a report
   --new3ds                         emulate a New 3DS
   --profile                        collect a sampling profile and print it
-  --recompiled <path>              run code 3dsrecomp built for the title, a
-                                   library or a directory holding <title id>.so
-                                   (.dylib on macOS, .dll on Windows, default:
-                                   the one 3dsrecomp build installed for it, in
-                                   the system's place for data,
-                                   ~/.local/share/3dsrecomp,
-                                   ~/Library/Application Support/3dsrecomp or
-                                   %APPDATA%\\3dsrecomp)
-  --interpreter                    interpret everything, even with recompiled
-                                   code around
+  --recompiled <path>              run locally recompiled code for this title
+  --interpreter                    interpret everything
   --mute                           play no sound
-  --data <dir>                     where saves live (default: the system's
-                                   place for data, ~/.local/share/zakuro,
-                                   ~/Library/Application Support/zakuro or
-                                   %APPDATA%\\zakuro)
+  --data <dir>                     where settings and saves live (default:
+                                   ~/.local/share/angry-birds-trilogy,
+                                   ~/Library/Application Support/angry-birds-trilogy
+                                   or %APPDATA%\\angry-birds-trilogy)
   -h, --help                       show this message
-
-The system font cannot be generated: put a dump at sysdata/shared_font.bin, in
-the working directory or where saves live, for titles that render text with it.
 ";
 
 pub fn parse() -> Result<Options, String> {

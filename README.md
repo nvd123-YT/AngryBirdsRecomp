@@ -71,8 +71,8 @@ For a normal user, the prebuilt packages on the Releases page are the easiest op
 Example first release:
 
 ~~~
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.2.32
+git push origin v0.2.32
 ~~~
 
 The pushed tag identifies the exact source revision used for that release.

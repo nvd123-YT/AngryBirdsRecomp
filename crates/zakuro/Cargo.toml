@@ -3,13 +3,13 @@ name = "zakuro"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "A high-level-emulation Nintendo 3DS emulator"
+description = "Angry Birds Trilogy desktop runtime and launcher"
 
 [lib]
 path = "src/lib.rs"
 
 [[bin]]
-name = "zakuro"
+name = "angry-birds-trilogy"
 path = "src/main.rs"
 
 [dependencies]

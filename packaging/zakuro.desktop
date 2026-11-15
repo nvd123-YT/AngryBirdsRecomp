@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
-Name=Zakuro
-Comment=A Nintendo 3DS emulator
-Exec=zakuro %f
+Name=Angry Birds Trilogy
+Comment=Angry Birds Trilogy for desktop
+Exec=angry-birds-trilogy %f
 Icon=zakuro
 Terminal=false
 Categories=Game;Emulator;

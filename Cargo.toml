@@ -14,7 +14,7 @@ version = "0.2.32"
 edition = "2021"
 rust-version = "1.95"
 license = "MIT"
-repository = "https://github.com/fearkov/zakuro"
+repository = "https://github.com/nvd123-YT/AngryBirdsRecomp"
 
 [workspace.dependencies]
 zakuro-common = { path = "crates/zakuro-common" }

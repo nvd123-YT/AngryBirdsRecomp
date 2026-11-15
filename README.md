@@ -65,17 +65,17 @@ For a normal user, the prebuilt packages on the Releases page are the easiest op
 ## GitHub Actions and releases
 
 - **CI** runs on pushes and pull requests. It builds and tests the Rust workspace on Windows, macOS, and Linux. It also keeps a Windows executable as a temporary Actions artifact.
-- **Release** runs when a v* version tag is pushed. It builds Windows x64, macOS Apple silicon, macOS Intel, and Linux x64 packages. Only after all build jobs succeed does it create a GitHub Release and attach the packages.
-- You can also run the Release workflow manually from the Actions tab. Set tag to an existing tag to publish it. To test a branch without publishing, set tag to the branch name and set publish to false.
+- **Release** builds Windows x64, macOS Apple silicon, macOS Intel, and Linux x64 packages. It runs when a version tag is created or pushed. Once every platform build succeeds, it attaches the packages to the GitHub Release and publishes it. If you created a draft release on GitHub first, the workflow fills that draft with the packages and publishes it after the builds finish.
+- To test a branch without publishing, open **Actions → Angry Birds Trilogy Release → Run workflow**, enter the branch name (such as `main`) in `tag`, and set `publish` to `false`. The packages remain temporary Actions artifacts.
 
-Example first release:
+### Creating version 1.0.0 on GitHub
 
-~~~
-git tag v1.0.0
-git push origin v1.0.0
-~~~
+1. Open the repository and select **Releases → Draft a new release**.
+2. In **Choose a tag**, type `v1.0.0`, then select **Create new tag: v1.0.0**.
+3. Set **Target** to `main`.
+4. Select **Save draft**. Creating the tag on the Releases page triggers the release build. The workflow will attach all four platform packages and publish the draft when they are ready.
 
-The pushed tag identifies the exact source revision used for that release.
+The Rust workspace version is `1.0.0`, and the matching Git tag is `v1.0.0`.
 
 ## Attribution and legal notes
 

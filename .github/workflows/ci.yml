@@ -1,5 +1,5 @@
-# builds and tests Zakuro on Linux, macOS and Windows, and keeps the Windows program
-name: CI
+# Builds and tests Angry Birds Trilogy on Linux, macOS and Windows.
+name: Angry Birds Trilogy CI
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: \${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
       - name: Sound library headers
@@ -27,5 +27,5 @@ jobs:
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v7
         with:
-          name: zakuro-windows
-          path: target/release/zakuro.exe
+          name: angry-birds-trilogy-windows
+          path: target/release/angry-birds-trilogy.exe

@@ -7,6 +7,19 @@ use crate::recompile::Wanted;
 
 /// file endings of games Zakuro opens.
 const GAME_FILES: [&str; 4] = ["3ds", "cci", "cxi", "cia"];
+
+/// Retail base-game IDs for Angry Birds Trilogy (USA and Europe).
+const SUPPORTED_GAME_IDS: [u64; 2] = [0x0004_0000_000A_E200, 0x0004_0000_000A_F400];
+
+/// Whether a file is one of the supported Angry Birds Trilogy base games.
+pub fn supports_game(program_id: u64) -> bool {
+    SUPPORTED_GAME_IDS.contains(&program_id)
+}
+
+/// Whether an update or add-on belongs to one of the supported base games.
+fn belongs_to_supported_game(title_id: u64) -> bool {
+    SUPPORTED_GAME_IDS.iter().any(|game_id| game_id & 0xFFFF_FFFF == title_id & 0xFFFF_FFFF)
+}
 /// the icon's side, in pixels.
 pub const ICON_SIZE: usize = 48;
 
@@ -159,6 +172,11 @@ fn scan(folder: &Path, data_dir: Option<&Path>) -> (Vec<Game>, Vec<Addon>) {
             None => games.push(read_or_list_unreadable(&path, data_dir)),
         }
     }
+    // This fork is deliberately game-specific: hide unsupported games and
+    // ignore their updates, DLC and Download Play titles.
+    games.retain(|game| supports_game(game.program_id));
+    addons.retain(|addon| belongs_to_supported_game(addon.title_id));
+
     // each update and DLC goes with the game of its id, the newest update
     for addon in addons {
         let kind = zakuro_fs::TitleKind::of(addon.title_id);
@@ -195,7 +213,7 @@ fn scan(folder: &Path, data_dir: Option<&Path>) -> (Vec<Game>, Vec<Addon>) {
 pub fn addons_beside(path: &Path) -> Option<(Option<Addon>, Vec<Addon>, Option<Addon>)> {
     let program_id = zakuro_fs::Title::load(path).ok()?.program_id();
     // a Download Play child has its game's id, but none of its update or DLC
-    if zakuro_fs::TitleKind::of(program_id) != zakuro_fs::TitleKind::Game {
+    if !supports_game(program_id) || zakuro_fs::TitleKind::of(program_id) != zakuro_fs::TitleKind::Game {
         return None;
     }
     let (mut update, mut dlc, mut dlp_child) = (None::<Addon>, Vec::new(), None);
@@ -237,7 +255,7 @@ fn addon(path: &Path) -> Option<Result<Addon, String>> {
         return None;
     }
     if cia.contents.iter().any(|content| content.offset.is_some() && content.encrypted()) {
-        return Some(Err("Encrypted, Zakuro needs a decrypted dump".to_owned()));
+        return Some(Err("Encrypted, this build needs a decrypted Angry Birds Trilogy dump".to_owned()));
     }
     Some(Ok(Addon { path: path.to_owned(), title_id: cia.title_id, version: cia.version }))
 }
@@ -247,7 +265,7 @@ fn addon(path: &Path) -> Option<Result<Addon, String>> {
 fn read_or_list_unreadable(path: &Path, data_dir: Option<&Path>) -> Game {
     std::panic::catch_unwind(|| read_game(path, data_dir)).unwrap_or_else(|_| {
         log::error!("reading {} failed", path.display());
-        unplayable(path, "Zakuro couldn't read it, please report it".to_owned())
+        unplayable(path, "Angry Birds Trilogy couldn't read this file, please report it".to_owned())
     })
 }
 
@@ -313,7 +331,7 @@ fn problem(error: &zakuro_fs::FsError) -> String {
             if let Some(first) = what.get_mut(..1) {
                 first.make_ascii_uppercase();
             }
-            format!("{what} Zakuro couldn't read, it goes in the folder next to its game")
+            format!("{what} cannot be opened by the Angry Birds Trilogy build")
         }
         _ => format!("Can't be read, {error}"),
     }
@@ -405,6 +423,18 @@ mod tests {
     }
 
     #[test]
+    fn only_angry_birds_trilogy_retail_ids_are_supported() {
+        let usa = 0x0004_0000_000A_E200;
+        let europe = 0x0004_0000_000A_F400;
+        assert!(supports_game(usa));
+        assert!(supports_game(europe));
+        assert!(!supports_game(0x0004_0000_0005_5E00)); // Pokémon Y
+        assert!(!supports_game(0x0004_000E_000A_E200)); // update, not base game
+        assert!(belongs_to_supported_game(0x0004_000E_000A_E200)); // USA update
+        assert!(!belongs_to_supported_game(0x0004_000E_0005_5E00));
+    }
+
+    #[test]
     fn titles_are_read_in_english_first() {
         let mut data = vec![0u8; 0x36C0];
         data[..4].copy_from_slice(b"SMDH");
@@ -445,7 +475,7 @@ mod tests {
         let folder = std::env::temp_dir().join(format!("zakuro-library-addons-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&folder);
         std::fs::create_dir_all(&folder).unwrap();
-        let game = 0x0004_0000_00AB_CD00u64;
+        let game = 0x0004_0000_000A_E200u64;
         let update = |version: u16| cia(game | 0x000E_0000_0000, version, &[(0, Some(&ncch(game | 0x000E_0000_0000, Some(&[2; 8]), &[])))]);
         std::fs::write(folder.join("game.cxi"), ncch(game, Some(&[1; 8]), &[])).unwrap();
         std::fs::write(folder.join("old.cia"), update(0x0400)).unwrap();
@@ -455,7 +485,7 @@ mod tests {
         let orphan = 0x0004_000E_0000_0001u64;
         std::fs::write(folder.join("orphan.cia"), cia(orphan, 1, &[(0, Some(&ncch(orphan, Some(&[3; 8]), &[])))])).unwrap();
         // Download Play children, the game's and one of a game not there
-        let child = 0x0004_0001_00AB_CD00u64;
+        let child = 0x0004_0001_000A_E200u64;
         std::fs::write(folder.join("child.cia"), cia(child, 0, &[(0, Some(&ncch(child, Some(&[4; 8]), &[])))])).unwrap();
         let stray = 0x0004_0001_0000_0002u64;
         std::fs::write(folder.join("stray.cia"), cia(stray, 0, &[(0, Some(&ncch(stray, Some(&[5; 8]), &[])))])).unwrap();
@@ -467,16 +497,10 @@ mod tests {
         assert_eq!(found.dlp_child.as_ref().map(|addon| addon.title_id), Some(child));
         let mut children: Vec<u64> = children.iter().map(|addon| addon.title_id).collect();
         children.sort();
-        assert_eq!(children, [stray, child]);
+        assert_eq!(children, [child]);
         let unplayable: Vec<&str> = games.iter().filter_map(|entry| entry.problem.as_deref()).collect();
-        assert_eq!(
-            unplayable,
-            [
-                "An update for a game that isn't in this folder",
-                "A Download Play program, it plays from the Multiplayer window when a host offers its game"
-            ]
-        );
-        assert_eq!(games.len(), 3);
+        assert!(unplayable.is_empty(), "unsupported add-ons are not shown");
+        assert_eq!(games.len(), 1, "only the supported base game is listed");
         // a game started from the command line gets the same from its folder
         let (beside_update, beside_dlc, beside_child) = addons_beside(&folder.join("game.cxi")).unwrap();
         assert_eq!(beside_update.map(|addon| addon.version), Some(0x0410));

@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
   <key>CFBundleName</key>
-  <string>Zakuro</string>
+  <string>Angry Birds Trilogy</string>
   <key>CFBundleDisplayName</key>
   <string>Zakuro</string>
   <key>CFBundleIdentifier</key>
-  <string>io.github.fearkov.zakuro</string>
+  <string>io.github.nvd123-yt.angrybirdstrilogy</string>
   <key>CFBundleExecutable</key>
-  <string>zakuro</string>
+  <string>angry-birds-trilogy</string>
   <key>CFBundleIconFile</key>
   <string>zakuro</string>
   <key>CFBundlePackageType</key>

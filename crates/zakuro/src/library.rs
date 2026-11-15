@@ -324,7 +324,7 @@ fn read_game(path: &Path, data_dir: Option<&Path>) -> Game {
 fn problem(error: &zakuro_fs::FsError) -> String {
     use zakuro_fs::FsError;
     match error {
-        FsError::Encrypted(_) | FsError::EncryptedCia => "Encrypted, Zakuro needs a decrypted dump".to_owned(),
+        FsError::Encrypted(_) | FsError::EncryptedCia => "Encrypted, this build needs a decrypted Angry Birds Trilogy dump".to_owned(),
         FsError::UnreadableRomFs(_) => "Partly encrypted or damaged, it needs dumping again".to_owned(),
         FsError::NotAGame(what) => {
             let mut what = what.to_string();
@@ -415,10 +415,10 @@ mod tests {
 
     #[test]
     fn files_that_cant_be_played_say_why() {
-        assert_eq!(problem(&zakuro_fs::FsError::EncryptedCia), "Encrypted, Zakuro needs a decrypted dump");
+        assert_eq!(problem(&zakuro_fs::FsError::EncryptedCia), "Encrypted, this build needs a decrypted Angry Birds Trilogy dump");
         assert_eq!(
             problem(&zakuro_fs::FsError::NotAGame("an update")),
-            "An update Zakuro couldn't read, it goes in the folder next to its game"
+            "An update cannot be opened by the Angry Birds Trilogy build"
         );
     }
 

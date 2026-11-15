@@ -75,7 +75,7 @@ pub fn run_with(linked: Option<Linked>, overlay: Option<Box<dyn GameOverlay>>) {
     let options = match cli::parse() {
         Ok(options) => options,
         Err(message) => {
-            eprintln!("zakuro: {message}");
+            eprintln!("Angry Birds Trilogy: {message}");
             std::process::exit(2);
         }
     };
@@ -170,7 +170,7 @@ pub fn run_with(linked: Option<Linked>, overlay: Option<Box<dyn GameOverlay>>) {
     let event_loop = EventLoop::new().expect("create an event loop");
     event_loop.set_control_flow(ControlFlow::Poll);
     if let Err(error) = event_loop.run_app(&mut app) {
-        eprintln!("zakuro: {error}");
+        eprintln!("Angry Birds Trilogy: {error}");
     }
 }
 
@@ -200,7 +200,7 @@ fn default_data_dir() -> Option<PathBuf> {
     } else {
         var("XDG_DATA_HOME").or_else(|| var("HOME").map(|home| home.join(".local/share")))
     };
-    dir.map(|dir| dir.join("zakuro"))
+    dir.map(|dir| dir.join("angry-birds-trilogy"))
 }
 
 /// how long ago a state was saved, as a person would say it.
@@ -529,7 +529,7 @@ impl ApplicationHandler for App {
         }
 
         let size = self.window_size();
-        let attributes = Window::default_attributes().with_title("Zakuro").with_inner_size(size);
+        let attributes = Window::default_attributes().with_title("Angry Birds Trilogy").with_inner_size(size);
         let renderer = self.options.renderer.unwrap_or(match self.settings.renderer {
             Renderer::Vulkan => RendererKind::Vulkan,
             Renderer::OpenGl => RendererKind::OpenGl,
@@ -559,7 +559,7 @@ impl ApplicationHandler for App {
                 self.start();
             }
             Err(error) => {
-                eprintln!("zakuro: could not start the {renderer:?} backend: {error}");
+                eprintln!("Angry Birds Trilogy: could not start the {renderer:?} backend: {error}");
                 event_loop.exit();
             }
         }
@@ -694,6 +694,9 @@ impl App {
         // a Download Play child listed apart from its game is there with no id
         let known = self.library.games.iter().find(|game| game.path == path && game.problem.is_none()).map(|game| game.program_id);
         let program_id = known.or_else(|| Some(zakuro_fs::Title::load(path).ok()?.program_id()));
+        if program_id.is_some_and(|id| !library::supports_game(id)) {
+            return Err("This build only supports Angry Birds Trilogy (USA and Europe releases).".to_owned());
+        }
         self.active = self.settings.for_game(program_id);
         let started = self.start_game(path);
         if started.is_err() {

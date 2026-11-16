@@ -667,7 +667,7 @@ impl App {
             self.paused = true;
         } else if let Some(rom) = self.options.rom.clone() {
             if let Err(error) = self.play(Path::new(&rom)) {
-                eprintln!("zakuro: {error}");
+                eprintln!("Angry Birds Recomp: {error}");
                 std::process::exit(1);
             }
         }
@@ -769,7 +769,7 @@ impl App {
             in_software.then(|| GPU_FALLBACK.to_owned()),
             outdated.then(|| {
                 format!(
-                    "{} was recompiled by an older version of Zakuro. Recompile it again from the library to get the newest improvements.",
+                    "{} was recompiled by an older version of Angry Birds Recomp. Recompile it again from the library to get the newest improvements.",
                     game.name
                 )
             }),
@@ -1106,7 +1106,7 @@ impl App {
             Some(tools) if self.download_compiler && zig::download_size().is_some() && zig::can_download() => return Some(Toolchain::Download(tools)),
             Some(_) if zig::download_size().is_some() && zig::can_download() => self.menus.compiler_offer = Some(games.to_vec()),
             Some(_) if zig::download_size().is_some() => {
-                self.menus.message = Some(format!("Recompiling needs a C compiler, gcc or clang, or curl or wget for Zakuro to download one: {error}."));
+                self.menus.message = Some(format!("Recompiling needs a C compiler, gcc or clang, or curl or wget for Angry Birds Recomp to download one: {error}."));
             }
             _ => self.menus.message = Some(format!("Recompiling needs a C compiler: {error}.")),
         }
@@ -1435,8 +1435,8 @@ impl App {
             }
             if let Some(window) = &self.window {
                 let title = match &self.game {
-                    Some(game) => format!("Zakuro - {} - {}", game.name, game.system.status_line()),
-                    None => "Zakuro".to_owned(),
+                    Some(game) => format!("Angry Birds Recomp - {} - {}", game.name, game.system.status_line()),
+                    None => "Angry Birds Recomp".to_owned(),
                 };
                 window.set_title(&title);
             }
